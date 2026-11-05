@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>寶可夢深海挑戰｜中文問答</title>
+<style>
+:root{--bg:#071b2a;--panel:#102c40;--ink:#f4fbff;--muted:#a9c4d3;--cyan:#61e5dc;--yellow:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#1d5268,#0a2639 48%,#04121f);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;display:flex;justify-content:center;padding:24px 14px}
+main{width:min(720px,100%)}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px}
+.badge{border:1px solid #326079;border-radius:999px;padding:6px 12px}
+.hero{text-align:center;padding:25px 10px 18px}
+.orb{font-size:44px}
+h1{font-size:clamp(30px,7vw,48px);margin:5px 0}
+.sub{color:var(--muted)}
+.panel{background:linear-gradient(145deg,#14364c,#0d2639);border:1px solid #28516a;border-radius:22px;padding:22px;box-shadow:0 18px 55px #0005}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.stat{background:#0a2132;border-radius:13px;padding:10px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat strong{font-size:22px}
+.progress{height:7px;background:#071927;border-radius:9px;overflow:hidden;margin:4px 0 22px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),#a8f5b8);transition:width .25s}
+.round{display:flex;justify-content:space-between;color:var(--muted)}
+.timer{font-size:25px;font-weight:800;color:var(--yellow)}
+.question{font-size:clamp(21px,5vw,28px);line-height:1.45;text-align:center;min-height:94px;display:grid;place-items:center;padding:12px 0}
+.hint{text-align:center;color:var(--muted);font-size:13px;margin-bottom:18px}
+.entry{display:flex;gap:9px}
+.entry input{min-width:0;flex:1;border:1px solid #3b657c;background:#071d2c;color:white;border-radius:12px;padding:14px;font-size:17px}
+button{border:0;border-radius:12px;padding:12px 18px;font-weight:750;font-size:15px;cursor:pointer;background:var(--cyan);color:#062333}
+button.secondary{background:#24475b;color:var(--ink)}
+.actions{display:flex;gap:9px;margin-top:10px}
+.actions button{flex:1}
+.feedback{min-height:28px;text-align:center;padding:8px 0;color:var(--yellow);font-size:14px}
+.note{color:var(--muted);font-size:12px;text-align:center}
+.below{display:flex;justify-content:space-between;gap:10px;margin-top:14px;color:var(--muted);font-size:12px}
+.screen{display:none;text-align:center;padding:22px 8px}
+.screen h2{font-size:30px}
+.big{font-size:54px;font-weight:900;color:var(--cyan)}
+.resultline{color:var(--muted);line-height:1.8;margin:10px 0 20px}
+.foot{text-align:center;color:#7898aa;font-size:11px;margin:18px 0}
+@media(max-width:440px){
+.panel{padding:16px}
+.entry{flex-direction:column}
+.entry button{padding:13px}
+.below{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+<main>
+
+<div class="top">
+<span class="badge">🌊 中文版粉絲小遊戲</span>
+<span id="best">最佳深度：0 m</span>
+</div>
+
+<header class="hero">
+<div class="orb">🔴</div>
+<h1>寶可夢深海挑戰</h1>
+<p class="sub">你的寶可夢知識，究竟能潛多深？</p>
+</header>
+
+<section class="panel" id="game">
+
+<div class="stats">
+<div class="stat"><small>目前深度</small><strong id="depth">0 m</strong></div>
+<div class="stat"><small>本回合得分</small><strong id="score">0</strong></div>
+<div class="stat"><small>已完成題數</small><strong id="done">0 / 7</strong></div>
+</div>
+
+<div class="progress"><div class="bar" id="bar"></div></div>
+
+<div class="round">
+<span id="round">第 1 / 7 題</span>
+<span class="timer" id="timer">20</span>
+</div>
+
+<div class="question" id="question">準備好了嗎？</div>
+<div class="hint" id="hint">輸入符合條件的寶可夢中文名稱。</div>
+
+<div class="entry">
+<input id="answer" autocomplete="off" placeholder="輸入寶可夢名稱，例如：皮卡丘">
+<button id="submit">確認答案 ↵</button>
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+<div class="actions">
+<button class="secondary" id="skip">跳過這題</button>
+<button class="secondary" id="restart">重新開始</button>
+</div>
+
+<div class="below">
+<span>答錯不扣分，時間內可以繼續猜。</span>
+<span>答案越冷門，分數越高！</span>
+</div>
+
+</section>
+
+<section class="panel screen" id="result">
+<div class="orb">🏆</div>
+<h2>本次下潛完成！</h2>
+<div class="big" id="finalDepth">0 m</div>
+<div class="resultline" id="summary"></div>
+<button id="again">再挑戰一次</button>
+</section>
+
+<p class="foot">非官方粉絲作品，與任天堂及寶可夢公司無隸屬關係。題庫與稀有度為示範設定。</p>
+
+</main>
+
+<script>
+const rounds=[
+
+{q:'請說出一隻「水屬性」的寶可夢。',a:{
+'鯉魚王':35,'角金魚':55,'蚊香蝌蚪':45,'墨海馬':55,'海星星':50,'呆呆獸':30,'傑尼龜':15,'水箭龜':25,'暴鯉龍':20,'巨翅飛魚':75,'珍珠貝':80,'愛心魚':85,'醜醜魚':90,'海兔獸':65,'好壞星':75,'滴蛛':85,'潤水鴨':20,'波加曼':20,'蓋歐卡':10}},
+
+{q:'請說出一隻「可以透過進化石進化」的寶可夢。',a:{
+'伊布':10,'皮卡丘':20,'六尾':35,'臭臭花':35,'蚊香蛙':40,'海星星':45,'蛋蛋':40,'胖丁':35,'燈火幽靈':65,'雪童子':50,'奇魯莉安':45,'波克基古':40,'葉伊布':20,'冰伊布':20}},
+
+{q:'請說出一隻「具有兩段以上進化階段」的寶可夢。',a:{
+'妙蛙種子':10,'小火龍':10,'傑尼龜':10,'綠毛蟲':20,'獨角蟲':20,'波波':15,'小拉達':15,'超音蝠':25,'地鼠':30,'呆呆獸':20,'迷你龍':35,'幼基拉斯':45,'寶寶暴龍':65,'黏黏寶':55,'心鱗寶':70}},
+
+{q:'請說出一隻「電屬性」的寶可夢。',a:{
+'皮卡丘':10,'雷丘':20,'電擊獸':30,'雷伊布':25,'電龍':35,'落雷獸':45,'帕奇利茲':60,'電飛鼠':55,'麻麻小魚':65,'托戈德瑪爾':75,'啪嚓海膽':85,'電束木':90,'咚咚鼠':70,'倫琴貓':35}},
+
+{q:'請說出一隻「沒有進化型」的寶可夢。',a:{
+'拉普拉斯':25,'卡比獸':20,'百變怪':35,'乘龍':25,'夢幻':20,'肯泰羅':35,'無殼海兔':65,'圖圖犬':75,'大舌頭':10,'吉利蛋':10,'晃晃斑':80,'差不多娃娃':65,'泥偶小人':10,'花療環環':85,'磨牙彩皮魚':90}},
+
+{q:'請說出一隻「幽靈屬性」的寶可夢。',a:{
+'鬼斯':15,'鬼斯通':15,'耿鬼':10,'夢妖':40,'夜巡靈':45,'飄飄球':50,'哭哭面具':65,'燭光靈':55,'南瓜精':60,'謎擬Q':20,'怖思壺':75,'來悲茶':70,'墓仔狗':80}},
+
+{q:'請說出一隻「化石寶可夢」。',a:{
+'化石盔':25,'菊石獸':25,'化石翼龍':15,'太古羽蟲':55,'太古盔甲':40,'頭蓋龍':45,'盾甲龍':50,'始祖小鳥':60,'始祖大鳥':55,'寶寶暴龍':65,'怪顎龍':55,'冰雪龍':70,'冰雪巨龍':65,'鰓魚龍':80,'雷鳥龍':80,'鰓魚海獸':90}},
+
+{q:'請說出一隻「龍屬性」的寶可夢。',a:{
+'迷你龍':15,'哈克龍':20,'快龍':10,'烈咬陸鯊':15,'七夕青鳥':35,'暴飛龍':20,'三首惡龍':35,'黏美龍':30,'杖尾鱗甲龍':50,'多龍巴魯托':30,'蘋裹龍':65,'豐蜜龍':70,'戟脊龍':45,'摩托蜥':55,'雙斧戰龍':25}}
+
+];
+
+let order=[],idx=0,score=0,depth=0,time=20,clock=null,locked=false,seen=new Set();
+
+const $=id=>document.getElementById(id);
+const bestKey='pokemonDeepBest';
+
+function norm(s){
+return s.trim().replace(/[\s　]/g,'').toLowerCase()
+}
+
+function update(){
+$('depth').textContent=depth+' m';
+$('score').textContent=score;
+$('done').textContent=idx+' / 7';
+$('bar').style.width=(idx/7*100)+'%';
+$('best').textContent='最佳深度：'+(localStorage.getItem(bestKey)||0)+' m';
+}
+
+function start(){
+clearInterval(clock);
+order=[...rounds.keys()].sort(()=>Math.random()-.5).slice(0,7);
+idx=0;score=0;depth=0;seen.clear();
+$('game').style.display='block';
+$('result').style.display='none';
+update();
+show();
+}
+
+function show(){
+if(idx>=7){finish();return}
+locked=false;
+time=20;
+$('timer').textContent=time;
+$('round').textContent=`第 ${idx+1} / 7 題`;
+$('question').textContent=rounds[order[idx]].q;
+$('hint').textContent='輸入符合條件的寶可夢中文名稱。';
+$('feedback').textContent='';
+$('answer').value='';
+$('answer').disabled=false;
+$('submit').disabled=false;
+clearInterval(clock);
+clock=setInterval(()=>{
+time--;
+$('timer').textContent=time;
+if(time<=0){
+clearInterval(clock);
+$('feedback').textContent='時間到！這題跳過。';
+setTimeout(next,850);
+}
+},1000);
+}
+
+function submit(){
+if(locked)return;
+let val=norm($('answer').value);
+if(!val)return;
+let answers=rounds[order[idx]].a;
+let hit=Object.keys(answers).find(k=>norm(k)===val);
+
+if(hit){
+locked=true;
+clearInterval(clock);
+let pts=answers[hit];
+score+=pts;
+depth+=pts*10;
+$('feedback').textContent=`答對了！${hit}　+${pts} 分，深入 ${pts*10} 公尺！`;
+$('answer').disabled=true;
+$('submit').disabled=true;
+update();
+setTimeout(next,1200);
+}else{
+$('feedback').textContent=seen.has(val)?'這個答案剛才已經試過了，再想想！':'這個答案不在本題可接受的答案中，再試一次！';
+seen.add(val);
+}
+}
+
+function next(){
+idx++;
+update();
+show();
+}
+
+function finish(){
+clearInterval(clock);
+$('game').style.display='none';
+$('result').style.display='block';
+$('finalDepth').textContent=depth+' m';
+$('summary').innerHTML=`總得分：<b>${score}</b> 分<br>完成題數：7 題<br>${depth>=5000?'太厲害了！你是深海知識探索家！':depth>=2500?'很不錯！你的寶可夢知識相當豐富。':'再多探索一些寶可夢，挑戰更深的海域吧！'}`;
+let old=Number(localStorage.getItem(bestKey)||0);
+if(depth>old)localStorage.setItem(bestKey,depth);
+$('best').textContent='最佳深度：'+Math.max(old,depth)+' m';
+}
+
+$('submit').onclick=submit;
+$('answer').addEventListener('keydown',e=>{
+if(e.key==='Enter')submit();
+});
+$('skip').onclick=()=>{
+if(!locked){
+clearInterval(clock);
+next();
+}
+};
+$('restart').onclick=start;
+$('again').onclick=start;
+
+start();
+</script>
+</body>
+</html>
